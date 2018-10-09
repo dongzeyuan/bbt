@@ -22,8 +22,8 @@ SAMPLE_SCREEN_WIDTH = 46
 SAMPLE_SCREEN_HEIGHT = 20
 SAMPLE_SCREEN_X = 20
 SAMPLE_SCREEN_Y = 10
-cwd_path = os.path.dirname(os.path.realpath(__file__))
-data_path = os.path.abspath(os.path.join(cwd_path, '..', 'data'))
+cwd_path = os.path.dirname(os.path.abspath(__file__))
+data_path = os.path.realpath(os.path.join(cwd_path, '..', 'data'))
 font = os.path.join(data_path, 'fonts', 'consolas10x10_gs_tc.png')
 libtcod.console_set_custom_font(font, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 libtcod.console_init_root(80, 50, 'libtcod Python sample', False)
