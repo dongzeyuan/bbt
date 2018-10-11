@@ -121,7 +121,7 @@ def handle_keys():
 #############################################
 
 libtcod.console_set_custom_font(
-    'E:\Python\\bbt\\fonts\\arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+    'D:\code\BBT\\fonts\\arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT,
                           'Bored Battle Theater', False)
 libtcod.sys_set_fps(LIMIT_FPS)
