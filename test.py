@@ -1,3 +1,5 @@
+import pprint
+
 class Tile(object):
     # a tile of the map and its properties
     def __init__(self, blocked, block_sight=None):
@@ -10,14 +12,11 @@ class Tile(object):
 
 def make_map():
     global game_map 
-    game_map = [[[]]]
-
     # fill map with "unblocked" tiles
-    for x in range(10):
-        tile = Tile(False)
-        game_map.append(tile)
+    game_map = [[Tile(False) for y in range(50)] for x in range(80)]
 
 
 if __name__ == "__main__":
     make_map()
+    pprint.pprint(game_map[0][3])
     
