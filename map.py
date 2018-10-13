@@ -37,7 +37,7 @@ class Object:
 
     def move(self, dx, dy):
         # move by the given amount, if the destination is not blocked
-        if not map[self.x + dx][self.y + dy].blocked:
+        if not game_map[self.x + dx][self.y + dy].blocked:
             self.x += dx
             self.y += dy
 
@@ -53,19 +53,30 @@ class Object:
 
 
 def make_map():
-    global map
-
+    global game_map
     # fill map with "unblocked" tiles
-    map = [
-        [Tile(False) for y in range(MAP_HEIGHT)]
-        for x in range(MAP_WIDTH)
-    ]
+    game_map = [[Tile(False) for y in range(SCREEN_HEIGHT)] for x in range(SCREEN_WIDTH)]
 
-    # place two pillars to test the map
-    map[30][22].blocked = True
-    map[30][22].block_sight = True
-    map[50][22].blocked = True
-    map[50][22].block_sight = True
+    room1 = Rect(20, 15, 10, 15)
+    room2 = Rect(50, 15, 10, 15)
+    creat_room(room1)
+    creat_room(room2)
+
+
+class Rect():
+    def __init__(self, x, y, w, h):
+        self.x1 = x
+        self.y1 = y
+        self.x2 = x + w
+        self.y2 = y + h
+
+
+def creat_room(room):
+    global game_map
+    for x in range(room.x1, room.x2 + 1):
+        for y in range(room.y1, room.y2 + 1):
+            game_map[x][y].blocked = False
+            game_map[x][y].block_sight = False
 
 
 def render_all():
@@ -75,7 +86,7 @@ def render_all():
     # go through all tiles, and set their background color
     for y in range(MAP_HEIGHT):
         for x in range(MAP_WIDTH):
-            wall = map[x][y].block_sight
+            wall = game_map[x][y].block_sight
             if wall:
                 libtcod.console_set_char_background(
                     con, x, y, color_dark_wall, libtcod.BKGND_SET)
@@ -121,20 +132,20 @@ def handle_keys():
 #############################################
 
 libtcod.console_set_custom_font(
-    'D:\code\BBT\\fonts\\arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+    'E:\Python\\bbt\\fonts\\arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT,
                           'Bored Battle Theater', False)
 libtcod.sys_set_fps(LIMIT_FPS)
 con = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
 
 # create object representing the player
-player = Object(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, '@', libtcod.white)
+player = Object(25, 23, '@', libtcod.white)
 
 # create an NPC
-npc = Object(SCREEN_WIDTH // 2 - 5, SCREEN_HEIGHT // 2, '@', libtcod.yellow)
+# npc = Object(25 - 5, 23, '@', libtcod.yellow)
 
 # the list of objects with those two
-objects = [npc, player]
+objects = [player]
 
 # generate map (at this point it's not drawn to the screen)
 make_map()
