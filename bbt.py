@@ -3,8 +3,8 @@ import tcod
 
 
 # setup the font
-tcod.console_set_custom_font('D:\code\BBT\\fonts\\arial10x10.png',
-                             tcod.FONT_LAYOUT_ASCII_INROW | tcod.FONT_LAYOUT_TCOD,)
+tcod.console_set_custom_font('bbt\\fonts\\arial10x10.png',
+                             tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD,)
 
 # initialize the root console in a context.
 tcod.console_init_root(80,60,"title",False)
