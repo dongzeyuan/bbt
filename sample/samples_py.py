@@ -560,7 +560,7 @@ def render_fov(first, key, mouse):
             '########       #####      ####################',
             '##############################################',
             ]
-    TORCH_RADIUS = 10
+    TORCH_RADIUS = 5
     SQUARED_TORCH_RADIUS = TORCH_RADIUS * TORCH_RADIUS
     dx = 0.0
     dy = 0.0

@@ -17,10 +17,14 @@ MAX_ROOMS = 30
 
 LIMIT_FPS = 30  # 20 frames-per-second maximum
 
+color_dark_wall = tcod.Color(119, 136, 153)
+color_dark_ground = tcod.Color(139, 134, 78)
 
-class Tile():
+
+class Tile:
     def __init__(self, blocked, block_sight=None):
         self.blocked = blocked
+
         if block_sight is None:
             block_sight = blocked
         self.block_sight = block_sight
@@ -71,8 +75,9 @@ def create_v_tunnel(y1, y2, x):
 
 def make_map():
     global game_map, player
-    game_map = [[Tile(True) for y in range(SCREEN_HEIGHT)
-                 for x in range(SCREEN_WIDTH)]]
+
+    game_map = [[Tile(True) for y in range(SCREEN_HEIGHT)]
+                for x in range(SCREEN_WIDTH)]
 
     rooms = []
     num_rooms = 0
@@ -107,10 +112,10 @@ def render_all():
         for x in range(MAP_WIDTH):
             wall = game_map[x][y].block_sight
             if wall:
-                tcod.console_set_background(
+                tcod.console_set_char_background(
                     con, x, y, color_dark_wall, tcod.BKGND_SET)
             else:
-                tcod.console_set_background(
+                tcod.console_set_char_background(
                     con, x, y, color_dark_ground, tcod.BKGND_SET)
 
     tcod.console_blit(con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
