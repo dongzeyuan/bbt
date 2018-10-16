@@ -107,6 +107,10 @@ class Rect():
         self.y1 = y
         self.x2 = x + w
         self.y2 = y + h
+        self.w = w
+        self.h = h
+        self.c_x = (self.x1 + self.x2) // 2
+        self.c_y = (self.y1 + self.y2) // 2
 
     def center(self):
         center_x = (self.x1 + self.x2) // 2
@@ -114,8 +118,8 @@ class Rect():
         return(center_x, center_y)
 
     def intersect(self, other):
-        return (self.x1 <= other.x2 and self.x2 >= other.x1 and
-                self.y1 <= other.y2 and self.y2 >= other.y1)
+        return ((abs(self.c_x - other.c_x) <= (self.w + other.w) // 2) and
+                (abs(self.c_y - other.c_y) <= (self.h + other.h) // 2))
 
 
 def create_room(room):
@@ -128,7 +132,7 @@ def create_room(room):
 
 def create_h_tunnel(x1, x2, y):
     global game_map
-    for x in range(min(x1, x2), max(x1, x2)+1):
+    for x in range(min(x1, x2), max(x1, x2) + 1):
         game_map[x][y].blocked = False
         game_map[x][y].block_sight = False
 
@@ -195,7 +199,7 @@ def handle_keys():
 tcod.console_set_custom_font(
     'bbt\\fonts\\arial10x10.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
 tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT,
-                          'Bored Battle Theater', False)
+                       'Bored Battle Theater', False)
 tcod.sys_set_fps(LIMIT_FPS)
 con = tcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
 
@@ -210,7 +214,7 @@ objects = [player]
 
 # generate map (at this point it's not drawn to the screen)
 make_map()
-create_h_tunnel(25, 55, 23)
+
 
 
 while not tcod.console_is_window_closed():
