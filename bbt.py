@@ -3,18 +3,18 @@ import tcod
 
 
 # actual size of the window
-SCREEN_WIDTH = 100
-SCREEN_HEIGHT = 80
+SCREEN_WIDTH = 101
+SCREEN_HEIGHT = 81
 
 # size of the game_map
-MAP_WIDTH = 100
-MAP_HEIGHT = 80
+MAP_WIDTH = 101
+MAP_HEIGHT = 81
 
 # number of the room
 ROOM_MAX_SIZE = 14
 ROOM_MIN_SIZE = 6
 MAX_ROOMS = 20
-TRIED_TIMES = 1000
+TRIED_TIMES = 2000
 
 LIMIT_FPS = 30  # 20 frames-per-second maximum
 
@@ -66,11 +66,10 @@ def make_game_map():
     global game_map
 
     game_map = [[Tile(True) for y in range(SCREEN_HEIGHT)]
-           for x in range(SCREEN_WIDTH)]
+                for x in range(SCREEN_WIDTH)]
 
     rooms = []
     tried = 0
-    
 
     for r in range(TRIED_TIMES):
         w = tcod.random_get_int(0, ROOM_MIN_SIZE, ROOM_MAX_SIZE)
