@@ -1,4 +1,4 @@
-import libtcodpy as libtcod
+import tcod
  
 #actual size of the window
 SCREEN_WIDTH = 80
@@ -21,10 +21,10 @@ TORCH_RADIUS = 10
 LIMIT_FPS = 20  #20 frames-per-second maximum
  
  
-color_dark_wall = libtcod.Color(0, 0, 100)
-color_light_wall = libtcod.Color(130, 110, 50)
-color_dark_ground = libtcod.Color(50, 50, 150)
-color_light_ground = libtcod.Color(200, 180, 50)
+color_dark_wall = tcod.Color(0, 0, 100)
+color_light_wall = tcod.Color(130, 110, 50)
+color_dark_ground = tcod.Color(50, 50, 150)
+color_light_ground = tcod.Color(200, 180, 50)
  
  
 class Tile:
@@ -74,14 +74,15 @@ class Object:
  
     def draw(self):
         #only show if it's visible to the player
-        if libtcod.map_is_in_fov(fov_map, self.x, self.y):
+        visible = tcod.map_is_in_fov(fov_map, int(self.x), int(self.y))
+        if visible:
             #set the color and then draw the character that represents this object at its position
-            libtcod.console_set_default_foreground(con, self.color)
-            libtcod.console_put_char(con, self.x, self.y, self.char, libtcod.BKGND_NONE)
+            tcod.console_set_default_foreground(con, self.color)
+            tcod.console_put_char(con, int(self.x), int(self.y), self.char, tcod.BKGND_NONE)
  
     def clear(self):
         #erase the character that represents this object
-        libtcod.console_put_char(con, self.x, self.y, ' ', libtcod.BKGND_NONE)
+        tcod.console_put_char(con, int(self.x), int(self.y), ' ', tcod.BKGND_NONE)
  
  
  
@@ -120,11 +121,11 @@ def make_map():
  
     for r in range(MAX_ROOMS):
         #random width and height
-        w = libtcod.random_get_int(0, ROOM_MIN_SIZE, ROOM_MAX_SIZE)
-        h = libtcod.random_get_int(0, ROOM_MIN_SIZE, ROOM_MAX_SIZE)
+        w = tcod.random_get_int(0, ROOM_MIN_SIZE, ROOM_MAX_SIZE)
+        h = tcod.random_get_int(0, ROOM_MIN_SIZE, ROOM_MAX_SIZE)
         #random position without going out of the boundaries of the map
-        x = libtcod.random_get_int(0, 0, MAP_WIDTH - w - 1)
-        y = libtcod.random_get_int(0, 0, MAP_HEIGHT - h - 1)
+        x = tcod.random_get_int(0, 0, MAP_WIDTH - w - 1)
+        y = tcod.random_get_int(0, 0, MAP_HEIGHT - h - 1)
  
         #"Rect" class makes rectangles easier to work with
         new_room = Rect(x, y, w, h)
@@ -157,7 +158,7 @@ def make_map():
                 (prev_x, prev_y) = rooms[num_rooms-1].center()
  
                 #draw a coin (random number that is either 0 or 1)
-                if libtcod.random_get_int(0, 0, 1) == 1:
+                if tcod.random_get_int(0, 0, 1) == 1:
                     #first move horizontally, then vertically
                     create_h_tunnel(prev_x, new_x, prev_y)
                     create_v_tunnel(prev_y, new_y, new_x)
@@ -179,26 +180,26 @@ def render_all():
     if fov_recompute:
         #recompute FOV if needed (the player moved or something)
         fov_recompute = False
-        libtcod.map_compute_fov(fov_map, player.x, player.y, TORCH_RADIUS, FOV_LIGHT_WALLS, FOV_ALGO)
+        tcod.map_compute_fov(fov_map, player.x, player.y, TORCH_RADIUS, FOV_LIGHT_WALLS, FOV_ALGO)
  
         #go through all tiles, and set their background color according to the FOV
         for y in range(MAP_HEIGHT):
             for x in range(MAP_WIDTH):
-                visible = libtcod.map_is_in_fov(fov_map, x, y)
+                visible = tcod.map_is_in_fov(fov_map, x, y)
                 wall = map[x][y].block_sight
                 if not visible:
                     #if it's not visible right now, the player can only see it if it's explored
                     if map[x][y].explored:
                         if wall:
-                            libtcod.console_set_char_background(con, x, y, color_dark_wall, libtcod.BKGND_SET)
+                            tcod.console_set_char_background(con, x, y, color_dark_wall, tcod.BKGND_SET)
                         else:
-                            libtcod.console_set_char_background(con, x, y, color_dark_ground, libtcod.BKGND_SET)
+                            tcod.console_set_char_background(con, x, y, color_dark_ground, tcod.BKGND_SET)
                 else:
                     #it's visible
                     if wall:
-                        libtcod.console_set_char_background(con, x, y, color_light_wall, libtcod.BKGND_SET )
+                        tcod.console_set_char_background(con, x, y, color_light_wall, tcod.BKGND_SET )
                     else:
-                        libtcod.console_set_char_background(con, x, y, color_light_ground, libtcod.BKGND_SET )
+                        tcod.console_set_char_background(con, x, y, color_light_ground, tcod.BKGND_SET )
                     #since it's visible, explore it
                     map[x][y].explored = True
  
@@ -207,35 +208,35 @@ def render_all():
         object.draw()
  
     #blit the contents of "con" to the root console
-    libtcod.console_blit(con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0)
+    tcod.console_blit(con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0)
  
 def handle_keys():
     global fov_recompute
  
-    #key = libtcod.console_check_for_keypress()  #real-time
-    key = libtcod.console_wait_for_keypress(True)  #turn-based
+    #key = tcod.console_check_for_keypress()  #real-time
+    key = tcod.console_wait_for_keypress(True)  #turn-based
  
-    if key.vk == libtcod.KEY_ENTER and key.lalt:
+    if key.vk == tcod.KEY_ENTER and key.lalt:
         #Alt+Enter: toggle fullscreen
-        libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+        tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
  
-    elif key.vk == libtcod.KEY_ESCAPE:
+    elif key.vk == tcod.KEY_ESCAPE:
         return True  #exit game
  
     #movement keys
-    if libtcod.console_is_key_pressed(libtcod.KEY_UP):
+    if tcod.console_is_key_pressed(tcod.KEY_UP):
         player.move(0, -1)
         fov_recompute = True
  
-    elif libtcod.console_is_key_pressed(libtcod.KEY_DOWN):
+    elif tcod.console_is_key_pressed(tcod.KEY_DOWN):
         player.move(0, 1)
         fov_recompute = True
  
-    elif libtcod.console_is_key_pressed(libtcod.KEY_LEFT):
+    elif tcod.console_is_key_pressed(tcod.KEY_LEFT):
         player.move(-1, 0)
         fov_recompute = True
  
-    elif libtcod.console_is_key_pressed(libtcod.KEY_RIGHT):
+    elif tcod.console_is_key_pressed(tcod.KEY_RIGHT):
         player.move(1, 0)
         fov_recompute = True
  
@@ -244,16 +245,16 @@ def handle_keys():
 # Initialization & Main Loop
 #############################################
  
-libtcod.console_set_custom_font('BBT\\fonts\\arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
-libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'python/libtcod tutorial', False)
-libtcod.sys_set_fps(LIMIT_FPS)
-con = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
+tcod.console_set_custom_font('BBT\\fonts\\arial10x10.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
+tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'python/tcod tutorial', False)
+tcod.sys_set_fps(LIMIT_FPS)
+con = tcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
  
 #create object representing the player
-player = Object(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, '@', libtcod.white)
+player = Object(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, '@', tcod.white)
  
 #create an NPC
-npc = Object(SCREEN_WIDTH/2 - 5, SCREEN_HEIGHT/2, '@', libtcod.yellow)
+npc = Object(SCREEN_WIDTH/2 - 5, SCREEN_HEIGHT/2, '@', tcod.yellow)
  
 #the list of objects with those two
 objects = [npc, player]
@@ -262,20 +263,20 @@ objects = [npc, player]
 make_map()
  
 #create the FOV map, according to the generated map
-fov_map = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
+fov_map = tcod.map_new(MAP_WIDTH, MAP_HEIGHT)
 for y in range(MAP_HEIGHT):
     for x in range(MAP_WIDTH):
-        libtcod.map_set_properties(fov_map, x, y, not map[x][y].block_sight, not map[x][y].blocked)
+        tcod.map_set_properties(fov_map, x, y, not map[x][y].block_sight, not map[x][y].blocked)
  
  
 fov_recompute = True
  
-while not libtcod.console_is_window_closed():
+while not tcod.console_is_window_closed():
  
     #render the screen
     render_all()
  
-    libtcod.console_flush()
+    tcod.console_flush()
  
     #erase all objects at their old locations, before they move
     for object in objects:
