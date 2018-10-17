@@ -54,52 +54,28 @@ class Rect():
                 (abs(self.c_y - other.c_y) < (self.h + other.h) // 2 + 4))
 
 
-def create_room(room):
-    global game_map
-    for x in range(room.x1, room.x2 + 1):
-        for y in range(room.y1, room.y2 + 1):
-            game_map[x][y].blocked = False
-            game_map[x][y].block_sight = False
+game_map = []
 
 
-def make_game_map():
+def flood_fill():
     global game_map
 
-    game_map = [[Tile(True) for y in range(SCREEN_HEIGHT)]
-           for x in range(SCREEN_WIDTH)]
+    game_map = [[Tile(True) for y in range(MAP_HEIGHT)]
+                for x in range(MAP_WIDTH)]
 
-    rooms = []
-    tried = 0
-    
-
-    for r in range(TRIED_TIMES):
-        w = tcod.random_get_int(0, ROOM_MIN_SIZE, ROOM_MAX_SIZE)
-        h = tcod.random_get_int(0, ROOM_MIN_SIZE, ROOM_MAX_SIZE)
-
-        x = tcod.random_get_int(0, 0, MAP_WIDTH - w - 1)
-        y = tcod.random_get_int(0, 0, MAP_HEIGHT - h - 1)
-
-        new_room = Rect(x, y, w, h)
-        failed = False
-
-        for other_room in rooms:
-            if new_room.intersect(other_room):
-                failed = True
-                break
-        if not failed:
-            create_room(new_room)
-            (new_x, new_y) = new_room.center()
-
-            rooms.append(new_room)
-            tried += 1
+    for y in range(1, MAP_HEIGHT - 1):
+        for x in range(1, MAP_WIDTH - 1):
+            if game_map[x-1][y-1].block_sight == True:
+                game_map[x][y].blocked = False
+                game_map[x][y].block_sight = False
 
 
 def render_all():
     global color_light_wall
     global color_light_ground
 
-    for y in range(MAP_HEIGHT):
-        for x in range(MAP_WIDTH):
+    for y in range(0, MAP_HEIGHT):
+        for x in range(0, MAP_WIDTH):
             wall = game_map[x][y].block_sight
             if wall:
                 tcod.console_set_char_background(
@@ -132,7 +108,7 @@ tcod.console_init_root(MAP_WIDTH, MAP_HEIGHT, "title", False)
 tcod.sys_set_fps(LIMIT_FPS)
 con = tcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-make_game_map()
+flood_fill()
 
 # MAIN LOOP
 while not tcod.console_is_window_closed():
