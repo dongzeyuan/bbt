@@ -34,6 +34,7 @@ class GameMap:
             for other_room in rooms:
                 if new_room.intersect(other_room):
                     break
+            # 这个else的缩进错误，花费了1小时去修正        
             else:
                 # this means there are no intersections, so this rooms is valid
 
