@@ -13,7 +13,8 @@ class GameMap:
         self.tiles = self.initialize_tiles()
 
     def initialize_tiles(self):
-        tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
+        tiles = [[Tile(True) for y in range(self.height)]
+                 for x in range(self.width)]
 
         return tiles
 
@@ -36,7 +37,7 @@ class GameMap:
             for other_room in rooms:
                 if new_room.intersect(other_room):
                     break
-            # 这个else的缩进错误，花费了1小时去修正        
+            # 这个else的缩进错误，花费了1小时去修正
             else:
                 # this means there are no intersections, so this rooms is valid
 
@@ -44,9 +45,9 @@ class GameMap:
                 self.create_room(new_room)
 
                 # center coordinates of new room, will be useful later
-                    
+
                 (new_x, new_y) = new_room.center()
-                    
+
                 if num_rooms == 0:
                     # this is the first room, where the player starts at
                     player.x = new_x
@@ -88,21 +89,23 @@ class GameMap:
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
 
-    def place_entities(self,room,entities,max_monsters_per_room):
+    def place_entities(self, room, entities, max_monsters_per_room):
         # Get a random number of monsters
         number_of_monster = randint(0, max_monsters_per_room)
 
         for i in range(number_of_monster):
             # Choose a random location in the room
             x = randint(room.x1 + 1, room.x2 - 1)
-            y = randint(room.y1+1, room.y2 -1)
+            y = randint(room.y1+1, room.y2 - 1)
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                if randint(0,100) < 80:
-                    monster = Entity(x,y,'o', tcod.desaturated_green)
+                if randint(0, 100) < 80:
+                    monster = Entity(
+                        x, y, 'o', tcod.desaturated_green, 'Orc', blocks=True)
 
                 else:
-                    monster = Entity(x,y,'T', tcod.darker_green)
+                    monster = Entity(
+                        x, y, 'T', tcod.darker_green, 'Troll', blocks=True)
 
                 entities.append(monster)
 
