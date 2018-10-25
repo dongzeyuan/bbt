@@ -32,7 +32,6 @@ bbt:
 |   |   fighter.py            战斗类的小插件，给player装配上Fighter就具备攻击行为
 |   |   __init__.py             
 |   
-|
 +---fonts
 |       arial10x10.png        游戏字体渲染
 |
@@ -42,4 +41,13 @@ bbt:
 |   |   tile.py               Tile，生成地图块，有block和sight_block属性，在FOV里处理地图的光照
 |   |   __init__.py
 |
+```
+
+### Part1
+在part1中主要讲了怎么创建一个console，然后在console中显示一个“@”并通过按键操纵@走动。
+
+```python
+tcod.console_set_custom_font('fontfile', flags)
+tcod.console_init_root(width,height,'title',False)
+tcod.console_put_char(0,1,1,"@",tcod.BKGND_NONE)
 ```
