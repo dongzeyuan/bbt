@@ -49,7 +49,7 @@ def main():
     entities = [player]
 
     tcod.console_set_custom_font(
-        "BBT\\fonts\\arial12x12.png", tcod.FONT_TYPE_GRAYSCALE | tcod.FONT_LAYOUT_TCOD)
+        "BBT\\fonts\\arial12x12.png", tcod.FONT_TYPE_GRAYSCALE | tcod.FONT_LAYOUT_TCOD) 
     tcod.console_init_root(screen_width, screen_height, 'Battle Theater', False)
 
     con = tcod.console_new(screen_width, screen_height)
