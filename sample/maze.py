@@ -7,13 +7,14 @@ class Tile:
     地图上的砖块，三个属性，blocked, block_sight, color.
     '''
 
-    def __init__(self, blocked, block_sight=None, color=tcod.grey):
+    def __init__(self, blocked, block_sight=None, maze=0, color=tcod.grey):
         self.blocked = blocked
 
         # By default, if a tile is blocked, it also blocks sight
         if block_sight is None:
             block_sight = blocked
         self.block_sight = block_sight
+        self.maze = maze
         self.color = color
 
 
@@ -89,16 +90,74 @@ class GameMap:
             for y in range(room.y1 + 1, room.y2):
                 self.tiles[x][y].blocked = False
                 self.tiles[x][y].block_sight = False
+                self.tiles[x][y].color = tcod.orange
 
     def create_maze(self):
-        # 随机选取一点
-        fail = False
+
         # top, bottom, left, right = (0,-2), (0,2), (-2,0)
+
         dir_dict = {'top': (0, -2), 'bottom': (0, 2),
                     'left': (-2, 0), 'right': (2, 0)}
         brige_dict = {'top': (0, -1), 'bottom': (0, 1),
-                    'left': (-1, 0), 'right': (1, 0)}
+                      'left': (-1, 0), 'right': (1, 0)}
+
+        find_start = False
+
+        dir_list1 = []
+        dir_list2 = []
+
         path = []
+
+        # 寻找初始点，如果初始点坐标的图块是黄色，将其变为红色
+        # 加入path，将find_start改为True，终止寻找
+        while not find_start:
+            x = randint(1, self.width-1)
+            y = randint(1, self.height-1)
+            if self.tiles[x][y].color == tcod.yellow and self.tiles[x][y].blocked == True:
+                self.tiles[x][y].color = tcod.red
+                path.append((x, y))
+                find_start = True
+            else:
+                continue
+
+        # 判断path长度，如果path为空，len（path）=0，停止循环
+
+        while len(path) < 30:
+            print(len(path))
+            x, y = path[-1]
+            # 判断四个方向坐标是否在地图内，如果在地图内，将其加入dir_list1
+            for key in dir_dict:
+                dx, dy = dir_dict.get(key)
+                if 1 <= x+dx <= 80 and 1 <= y+dy <= 50 and self.tiles[x+dx][y+dy].color == tcod.yellow:
+                    dir_list1.append(dir_dict.get(key))
+                    dx, dy = sample(dir_list1, 1)[0]
+                    self.tiles[x+dx][y+dy].color = tcod.red
+                    path.append((x+dx, y+dy))
+					if dx == -2:
+                		self.tiles[x-1][y].color = tcod.red
+            		if dx == 2:
+                		self.tiles[x+1][y].color = tcod.red
+            		if dy == -2:
+                		self.tiles[x][y-1].color = tcod.red
+            		if dy == 2:
+                		self.tiles[x][y+1].color = tcod.red
+                else:
+                    path.pop()
+
+            # 在dir_list1中寻找黄色图块，如果存在，将其加入dir_list2
+            # 如果不存在黄色图块，path列表删除最后一位
+            # for i in dir_list1:
+                # dx, dy = i
+                # if self.tiles[x+dx][y+dy].color == tcod.yellow:
+                    # dir_list2.append(i)
+
+            # 在dir_list2（在地图内的，且色块是黄色的坐标）中随机一个方块涂成红色
+                # dx, dy = sample(dir_list1, 1)[0]
+                self.tiles[x+dx][y+dy].color = tcod.red
+            # if (x+dx,y+dy) not in path:
+                # path.append((x+dx, y+dy))
+
+            # 将start和end之间的图块涂成红色
 
 
 
@@ -116,7 +175,7 @@ def render_all(con, game_map, colors):
 
             if not wall:
                 tcod.console_set_char_background(
-                    con, x, y, colors.get('dark_ground'), tcod.BKGND_SET)
+                    con, x, y, game_map.tiles[x][y].color, tcod.BKGND_SET)
             else:
                 tcod.console_set_char_background(
                     con, x, y, game_map.tiles[x][y].color, tcod.BKGND_SET)
