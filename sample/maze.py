@@ -21,9 +21,9 @@ class Tile:
 class Rect:
     def __init__(self, x, y, w, h):
         self.x1 = x
-        self.x2 = x+w
+        self.x2 = x + w
         self.y1 = y
-        self.y2 = y+h
+        self.y2 = y + h
         self.w = w
         self.h = h
         self.c_x = (self.x1 + self.x2) // 2
@@ -67,7 +67,7 @@ class GameMap:
 
             if self.tiles[x][y].color == tcod.yellow:
                 # 'Rect' class makes rectangles easier to work with
-                new_room = Rect(x-1, y-1, w, h)
+                new_room = Rect(x - 1, y - 1, w, h)
 
             # run through the other rooms and see if they intersect with this one
                 for other_room in rooms:
@@ -111,8 +111,8 @@ class GameMap:
         # 寻找初始点，如果初始点坐标的图块是黄色，将其变为红色
         # 加入path，将find_start改为True，终止寻找
         while not find_start:
-            x = randint(1, self.width-1)
-            y = randint(1, self.height-1)
+            x = randint(1, self.width - 1)
+            y = randint(1, self.height - 1)
             if self.tiles[x][y].color == tcod.yellow and self.tiles[x][y].blocked == True:
                 self.tiles[x][y].color = tcod.red
                 path.append((x, y))
@@ -122,28 +122,14 @@ class GameMap:
 
         # 判断path长度，如果path为空，len（path）=0，停止循环
 
-        while len(path) < 30:
+        while len(path):
             print(len(path))
             x, y = path[-1]
             # 判断四个方向坐标是否在地图内，如果在地图内，将其加入dir_list1
             for key in dir_dict:
                 dx, dy = dir_dict.get(key)
-                if 1 <= x+dx <= 80 and 1 <= y+dy <= 50 and self.tiles[x+dx][y+dy].color == tcod.yellow:
+                if 1 <= x + dx <= 80 and 1 <= y + dy <= 50 and self.tiles[x + dx][y + dy].color == tcod.yellow:
                     dir_list1.append(dir_dict.get(key))
-                    dx, dy = sample(dir_list1, 1)[0]
-                    self.tiles[x+dx][y+dy].color = tcod.red
-                    path.append((x+dx, y+dy))
-					if dx == -2:
-                		self.tiles[x-1][y].color = tcod.red
-            		if dx == 2:
-                		self.tiles[x+1][y].color = tcod.red
-            		if dy == -2:
-                		self.tiles[x][y-1].color = tcod.red
-            		if dy == 2:
-                		self.tiles[x][y+1].color = tcod.red
-                else:
-                    path.pop()
-
             # 在dir_list1中寻找黄色图块，如果存在，将其加入dir_list2
             # 如果不存在黄色图块，path列表删除最后一位
             # for i in dir_list1:
@@ -153,12 +139,27 @@ class GameMap:
 
             # 在dir_list2（在地图内的，且色块是黄色的坐标）中随机一个方块涂成红色
                 # dx, dy = sample(dir_list1, 1)[0]
-                self.tiles[x+dx][y+dy].color = tcod.red
+            if len(dir_list1):
+                dx, dy = sample(dir_list1, 1)[0]
+                self.tiles[x + dx][y + dy].color = tcod.red
+                path.append((x + dx, y + dy))
+                dir_list1 = []
+                self.tiles[x + dx][y + dy].color = tcod.red
+                if dx == -2:
+                    self.tiles[x - 1][y].color = tcod.red
+                if dx == 2:
+                    self.tiles[x + 1][y].color = tcod.red
+                if dy == -2:
+                    self.tiles[x][y - 1].color = tcod.red
+                if dy == 2:
+                    self.tiles[x][y + 1].color = tcod.red
+            else:
+                path.pop()
+
             # if (x+dx,y+dy) not in path:
                 # path.append((x+dx, y+dy))
 
             # 将start和end之间的图块涂成红色
-
 
 
 def handle_key(key):  # ESC退出
