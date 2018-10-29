@@ -32,8 +32,8 @@ class Rect:
     def intersect(self, other):
         # returns true if this rectangle intersects with another one.
         # 这里修改了重叠判定算法
-        return ((abs(self.c_x - other.c_x) < (self.w + other.w) // 2 + 1) and
-                (abs(self.c_y - other.c_y) < (self.h + other.h) // 2 + 1))
+        return ((abs(self.c_x - other.c_x) < (self.w + other.w) // 2 + 0) and
+                (abs(self.c_y - other.c_y) < (self.h + other.h) // 2 + 0))
 
 
 class GameMap:
@@ -121,30 +121,25 @@ class GameMap:
                 continue
 
         # 判断path长度，如果path为空，len（path）=0，停止循环
-
         while len(path):
-            print(len(path))
             x, y = path[-1]
             # 判断四个方向坐标是否在地图内，如果在地图内，将其加入dir_list1
             for key in dir_dict:
                 dx, dy = dir_dict.get(key)
-                if 1 <= x + dx <= 80 and 1 <= y + dy <= 50 and self.tiles[x + dx][y + dy].color == tcod.yellow:
+                if 1 <= x + dx <= self.width - 1 and 1 <= y + dy <= self.height - 1 and self.tiles[x + dx][y + dy].color == tcod.yellow:
                     dir_list1.append(dir_dict.get(key))
-            # 在dir_list1中寻找黄色图块，如果存在，将其加入dir_list2
-            # 如果不存在黄色图块，path列表删除最后一位
-            # for i in dir_list1:
-                # dx, dy = i
-                # if self.tiles[x+dx][y+dy].color == tcod.yellow:
-                    # dir_list2.append(i)
-
-            # 在dir_list2（在地图内的，且色块是黄色的坐标）中随机一个方块涂成红色
-                # dx, dy = sample(dir_list1, 1)[0]
+            # 判断dir_list1的长度，如果长度不为0，说明path[-1]周围至少有一个点可以向外延伸
+            # 如果为0，说明path[-1]点是个死胡同，需要删除，返回上一个点
             if len(dir_list1):
+                # 从dir_list1中随机一个方向
                 dx, dy = sample(dir_list1, 1)[0]
+                # 向此处延伸一个格子，涂红
                 self.tiles[x + dx][y + dy].color = tcod.red
+                # 加入path
                 path.append((x + dx, y + dy))
+                # 重置dir_list1
                 dir_list1 = []
-                self.tiles[x + dx][y + dy].color = tcod.red
+                # 下面四个语句判断延伸的方向，将两个格子中间位置涂红
                 if dx == -2:
                     self.tiles[x - 1][y].color = tcod.red
                 if dx == 2:
@@ -153,13 +148,9 @@ class GameMap:
                     self.tiles[x][y - 1].color = tcod.red
                 if dy == 2:
                     self.tiles[x][y + 1].color = tcod.red
+            # path[-1]点不满足要求，需删除
             else:
                 path.pop()
-
-            # if (x+dx,y+dy) not in path:
-                # path.append((x+dx, y+dy))
-
-            # 将start和end之间的图块涂成红色
 
 
 def handle_key(key):  # ESC退出
@@ -184,14 +175,14 @@ def render_all(con, game_map, colors):
 
 def main():
     screen_width = 81
-    screen_height = 51
+    screen_height = 67
 
     map_width = 81
-    map_height = 51
+    map_height = 67
 
-    room_max_size = [10, 12]
-    room_min_size = [10, 12]
-    max_tried = 300
+    room_max_size = [8, 10, 12]
+    room_min_size = [8, 10, 12]
+    max_tried = 500
 
     colors = {
         'dark_wall': tcod.Color(0, 0, 100),
