@@ -3,12 +3,15 @@ import tcod
 
 from render_functions import RenderOrder
 
+
 class Entity:
     '''
     表示玩家，敌人，物品之类的通用类
     '''
 
-    def __init__(self, x, y, char, color, name, blocks=False, render_order = RenderOrder.CORPSE, fighter=None, ai=None):
+    def __init__(self, x, y, char, color, name, blocks=False,
+                 render_order=RenderOrder.CORPSE, fighter=None, ai=None,
+                 item = None, inventory = None):
         self.x = x
         self.y = y
         self.char = char
@@ -18,12 +21,20 @@ class Entity:
         self.render_order = render_order
         self.fighter = fighter
         self.ai = ai
+        self.item = item
+        self.inventory = inventory
 
         if self.fighter:
             self.fighter.owner = self
 
         if self.ai:
             self.ai.owner = self
+        
+        if self.item:
+            self.item.owner = self
+
+        if self.inventory:
+            self.inventory.owner = self
 
     def move(self, dx, dy):
         # Move the entity by a given amount
@@ -50,7 +61,7 @@ class Entity:
         for y1 in range(game_map.height):
             for x1 in range(game_map.width):
                 tcod.map_set_properties(fov, x1, y1, not game_map.tiles[x1][y1].block_sight,
-                                           not game_map.tiles[x1][y1].blocked)
+                                        not game_map.tiles[x1][y1].blocked)
 
         # Scan all the objects to see if there are objects that must be navigated around
         # Check also that the object isn't self or the target (so that the start and the end points are free)
@@ -84,7 +95,6 @@ class Entity:
 
             # Delete the path to free memory
         tcod.path_delete(my_path)
-
 
     def distance_to(self, other):
         dx = other.x - self.x

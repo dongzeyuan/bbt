@@ -1,6 +1,7 @@
 import tcod
 
 from components.fighter import Fighter
+from components.inventory import Inventory
 from fov_funcitons import initialize_fov, recompute_fov
 from entity import Entity, get_blocking_entities_at_location
 from game_states import GameStates
@@ -45,13 +46,16 @@ def main():
     }
 
     fighter_component = Fighter(hp=30, defense=2, power=5)
+    inventory_component = Inventory(26)
     player = Entity(0, 0, "@", tcod.black, 'Player',
-                    blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component)
+                    blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component,
+                    inventory=inventory_component)
     entities = [player]
 
     tcod.console_set_custom_font(
-        "BBT\\fonts\\arial12x12.png", tcod.FONT_TYPE_GRAYSCALE | tcod.FONT_LAYOUT_TCOD) 
-    tcod.console_init_root(screen_width, screen_height, 'Battle Theater', False)
+        "BBT\\fonts\\arial12x12.png", tcod.FONT_TYPE_GRAYSCALE | tcod.FONT_LAYOUT_TCOD)
+    tcod.console_init_root(screen_width, screen_height,
+                           'Battle Theater', False)
 
     con = tcod.console_new(screen_width, screen_height)
     panel = tcod.console_new(screen_width, panel_height)
@@ -74,7 +78,8 @@ def main():
     # 游戏主循环
     while not tcod.console_is_window_closed():
 
-        tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE, key, mouse)
+        tcod.sys_check_for_event(
+            tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE, key, mouse)
 
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, fov_radius,
@@ -92,6 +97,7 @@ def main():
         action = handle_keys(key)
 
         move = action.get('move')
+        pickup = action.get('pickup')
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
 
