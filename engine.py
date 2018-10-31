@@ -74,6 +74,7 @@ def main():
     mouse = tcod.Mouse()
 
     game_state = GameStates.PLAYERS_TURN
+    previous_game_state = game_state
 
     # 游戏主循环
     while not tcod.console_is_window_closed():
@@ -86,7 +87,7 @@ def main():
                           fov_light_walls, fov_algorithm)
 
         render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width,
-                   screen_height, bar_width, panel_height, panel_y, mouse, colors)
+                   screen_height, bar_width, panel_height, panel_y, mouse, colors, game_state)
 
         fov_recompute = False
 
@@ -94,10 +95,12 @@ def main():
 
         clear_all(con, entities)
 
-        action = handle_keys(key)
+        action = handle_keys(key, game_state)
 
         move = action.get('move')
         pickup = action.get('pickup')
+        show_inventory = action.get('show_inventory')
+        Inventory_index = action.get('inventory_index')
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
 
@@ -128,10 +131,24 @@ def main():
 
                     break
                 else:
-                    message_log.add_message(Message('There is nothing here to pick up.', tcod.yellow))
+                    message_log.add_message(
+                        Message('There is nothing here to pick up.', tcod.yellow))
+
+        if show_inventory:
+            previous_game_state = game_state
+            game_state = GameStates.SHOW_INVENTORY
+
+        if Inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD and Inventory_index < len(
+                player.inventory.items):
+            item = player.inventory.items[inventory_index]
+            print(item)
 
         if exit:
-            return True
+            if game_state == GameStates.SHOW_INVENTORY:
+                game_state = previous_game_state
+            else:
+                return True
+
         if fullscreen:
             tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
 
