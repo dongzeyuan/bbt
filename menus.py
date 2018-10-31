@@ -16,7 +16,7 @@ def menu(con, header, options, width, screen_width, screen_height):
     # print the header, with auto-wrap
     tcod.console_set_default_foreground(window, tcod.white)
     tcod.console_print_rect_ex(
-        window, 0, 0, width, height, tcod.BKGND_NONE, tcod.left, header)
+        window, 0, 0, width, height, tcod.BKGND_NONE, tcod.LEFT, header)
 
     # print all the options
     y = header_height
