@@ -5,7 +5,7 @@ from components.inventory import Inventory
 from fov_funcitons import initialize_fov, recompute_fov
 from entity import Entity, get_blocking_entities_at_location
 from game_states import GameStates
-from input_handlers import handle_keys
+from input_handlers import handle_keys, handle_mouse
 from map_objects.game_map import GameMap
 from render_functions import clear_all, render_all, RenderOrder
 from death_functions import kill_monster, kill_player
@@ -96,6 +96,7 @@ def main():
         clear_all(con, entities)
 
         action = handle_keys(key, game_state)
+        mouse_action = handle_mouse(mouse)
 
         move = action.get('move')
         pickup = action.get('pickup')
@@ -104,6 +105,9 @@ def main():
         inventory_index = action.get('inventory_index')
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
+
+        left_click = mouse_action.get('left_click')
+        right_clikc = mouse_action.get('right_click')
 
         player_turn_results = []
 
@@ -147,7 +151,7 @@ def main():
                 player.inventory.items):
             item = player.inventory.items[inventory_index]
             if game_state == GameStates.SHOW_INVENTORY:
-                player_turn_results.extend(player.inventory.use(item))
+                player_turn_results.extend(player.inventory.use(item, entities=entities, fov_map=fov_map))
             elif game_state == GameStates.DROP_INVENTORY:
                 player_turn_results.extend(player.inventory.drop_item(item))
 
