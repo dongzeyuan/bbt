@@ -57,7 +57,7 @@ def handle_player_turn_keys(key):
 
 
 def handle_targeting_keys(key):
-    if key_vk == tcod.KEY_ESCAPE:
+    if key.vk == tcod.KEY_ESCAPE:
         return {'exit': True}
 
     return {}
@@ -84,7 +84,7 @@ def handle_mouse(mouse):
 
     if mouse.lbutton_pressed:
         return {'left_click': (x, y)}
-    elif more.rbutton_pressed:
+    elif mouse.rbutton_pressed:
         return {'right_click': (x, y)}
 
     return {}
