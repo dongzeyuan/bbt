@@ -1,5 +1,5 @@
 import tcod
-
+# TODO 看看到底怎么回事，一直有波浪线
 from components.fighter import Fighter
 from components.inventory import Inventory
 from fov_funcitons import initialize_fov, recompute_fov
