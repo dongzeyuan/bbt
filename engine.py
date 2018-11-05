@@ -2,15 +2,15 @@ import tcod
 
 # TODO 看看到底怎么回事，一直有波浪线
 # 很奇怪，readme更新，不显示contribute吗？
-from components.fighter import Fighter
-from components.inventory import Inventory
+from bbt.components.fighter import Fighter
+from bbt.components.inventory import Inventory
 from death_functions import kill_monster, kill_player
 from entity import Entity, get_blocking_entities_at_location
 from fov_funcitons import initialize_fov, recompute_fov
 from game_messages import Message, MessageLog
 from game_states import GameStates
 from input_handlers import handle_keys, handle_mouse
-from map_objects.game_map import GameMap
+from bbt.map_objects.game_map import GameMap
 from render_functions import RenderOrder, clear_all, render_all
 
 
