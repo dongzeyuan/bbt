@@ -51,3 +51,23 @@ tcod.console_set_custom_font('fontfile', flags)
 tcod.console_init_root(width,height,'title',False)
 tcod.console_put_char(0,1,1,"@",tcod.BKGND_NONE)
 ```
+
+### 怎么做一个roguelike游戏
+
+15步做一个roguelike游戏
+
+1. 下决心写游戏
+2. Hello World
+3. It's a Boy
+4. 地图
+5. 保存和读取
+6. It's Alive(其实就是做AI和战斗系统)
+7. 交互
+8. 数据文件（数据文件这一步至今没看到教程）
+9. 物品
+10. 魔法
+11. 简单游戏
+12. 关卡
+13. 经验值
+14. 村民（NPC）
+15. 随心所以加入任何想加入的coooooool的特性
