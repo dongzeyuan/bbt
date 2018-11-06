@@ -1,81 +1,41 @@
 import tcod
 
-# TODO 看看到底怎么回事，一直有波浪线
-# 很奇怪，readme更新，不显示contribute吗？
-from bbt.components.fighter import Fighter
-from bbt.components.inventory import Inventory
 from death_functions import kill_monster, kill_player
-from entity import Entity, get_blocking_entities_at_location
+from entity import get_blocking_entities_at_location
 from fov_funcitons import initialize_fov, recompute_fov
-from game_messages import Message, MessageLog
+from game_messages import Message
 from game_states import GameStates
 from input_handlers import handle_keys, handle_mouse
-from bbt.map_objects.game_map import GameMap
-from render_functions import RenderOrder, clear_all, render_all
+from bbt.loader_function.initialize_new_game import get_contants, get_game_variables
+from render_functions import clear_all, render_all
 
 
 def main():
-    screen_width = 80
-    screen_height = 50
-
-    bar_width = 20
-    panel_height = 7
-    panel_y = screen_height - panel_height
-
-    message_x = bar_width + 2
-    message_width = screen_width - bar_width - 2
-    message_height = panel_height - 1
-
-    map_width = 80
-    map_height = 43
-
-    room_max_size = 10
-    room_min_size = 6
-    max_rooms = 50
-
-    fov_algorithm = 5
-    fov_light_walls = True
-    fov_radius = 10
-
-    max_monster_per_room = 3
-    max_items_per_room = 2
-
-    colors = {
-        'dark_wall': tcod.Color(0, 0, 100),
-        'dark_ground': tcod.Color(50, 50, 150),
-        'light_wall': tcod.Color(130, 110, 50),
-        'light_ground': tcod.Color(200, 180, 50)
-    }
-
-    fighter_component = Fighter(hp=30, defense=2, power=5)
-    inventory_component = Inventory(26)
-    player = Entity(0, 0, "@", tcod.black, 'Player',
-                    blocks=True, render_order=RenderOrder.ACTOR, fighter=fighter_component,
-                    inventory=inventory_component)
-    entities = [player]
+    contants = get_contants
 
     tcod.console_set_custom_font(
         "BBT\\fonts\\arial12x12.png", tcod.FONT_TYPE_GRAYSCALE | tcod.FONT_LAYOUT_TCOD)
-    tcod.console_init_root(screen_width, screen_height,
-                           'Battle Theater', False)
+    tcod.console_init_root(contants['screen_width'], constants['screen_height'],
+                           contants['window_title'], False)
 
-    con = tcod.console_new(screen_width, screen_height)
-    panel = tcod.console_new(screen_width, panel_height)
+    con = tcod.console_new(
+        contants['screen_width'], constants['screen_height'])
+    panel = tcod.console_new(
+        contants['screen_width'], constants['screen_height'])
 
-    game_map = GameMap(map_width, map_height)
-    game_map.make_map(max_rooms, room_min_size, room_max_size,
-                      map_width, map_height, player, entities, max_monster_per_room, max_items_per_room)
+    player, entities, game_map, message_log, game_state = get_game_variables(
+        constants)
 
     fov_recompute = True
 
     fov_map = initialize_fov(game_map)
 
-    message_log = MessageLog(message_x, message_width, message_height)
+    message_log = MessageLog(
+        constants['message_x'], contants['message_width'], contants['message_height'])
 
     key = tcod.Key()
     mouse = tcod.Mouse()
 
-    game_state = GameStates.PLAYERS_TURN
     previous_game_state = game_state
 
     targeting_item = None
@@ -87,11 +47,11 @@ def main():
             tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE, key, mouse)
 
         if fov_recompute:
-            recompute_fov(fov_map, player.x, player.y, fov_radius,
-                          fov_light_walls, fov_algorithm)
+            recompute_fov(fov_map, player.x, player.y, contants['fov_radius'],
+                          constants['fov_light_walls'], constants['fov_algorithm'])
 
-        render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, screen_width,
-                   screen_height, bar_width, panel_height, panel_y, mouse, colors, game_state)
+        render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, contants['screen_width'],
+                   contants['screen_height'], contants['bar_width'], contants['panel_height'], contants['panel_y'], mouse, contants['colors'], game_state)
 
         fov_recompute = False
 
@@ -169,7 +129,6 @@ def main():
                 player_turn_results.extend(item_use_results)
             elif right_click:
                 player_turn_results.append({'targeting_cancelled': True})
-
 
         if exit:
             if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
