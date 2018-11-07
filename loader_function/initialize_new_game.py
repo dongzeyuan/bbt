@@ -1,8 +1,8 @@
 import tcod
 
-from bbt.component.fighter import Fighter
-from bbt.component.inventory import Inventory
-from bbt.map_objects.game_map import GameMap
+from components.fighter import Fighter
+from components.inventory import Inventory
+from map_objects.game_map import GameMap
 
 from entity import Entity
 from game_messages import MessageLog
@@ -35,14 +35,14 @@ def get_contants():
     fov_light_walls = True
     fov_radius = 10
 
-    max_monster_per_room = 3
-    max_item_per_room = 2
+    max_monsters_per_room = 3
+    max_items_per_room = 2
 
     colors = {
-        'dark_wall': tcod.color(0, 0, 100),
-        'dark_ground': tcod.color(50, 50, 150),
-        'light_wall': tcod.color(130, 110, 50),
-        'light_ground': tcod.color(200, 180, 50),
+        'dark_wall': tcod.Color(0, 0, 100),
+        'dark_ground': tcod.Color(50, 50, 150),
+        'light_wall': tcod.Color(130, 110, 50),
+        'light_ground': tcod.Color(200, 180, 50)
     }
 
     contants = {
@@ -78,13 +78,13 @@ def get_game_variables(contants):
                     fighter=fighter_component, inventory=inventory_component)
     entities = [player]
 
-    game_map = GameMap(constants['map_width'], constants['map_height'])
-    game_map.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'],
-                      constants['map_width'], constants['map_height'], player, entities,
-                      constants['max_monsters_per_room'], constants['max_items_per_room'])
+    game_map = GameMap(contants['map_width'], contants['map_height'])
+    game_map.make_map(contants['max_rooms'], contants['room_min_size'], contants['room_max_size'],
+                      contants['map_width'], contants['map_height'], player, entities,
+                      contants['max_monsters_per_room'], contants['max_items_per_room'])
 
     message_log = MessageLog(
-        constants['message_x'], constants['message_width'], constants['message_height'])
+        contants['message_x'], contants['message_width'], contants['message_height'])
 
     game_state = GameStates.PLAYERS_TURN
 

@@ -6,32 +6,29 @@ from fov_funcitons import initialize_fov, recompute_fov
 from game_messages import Message
 from game_states import GameStates
 from input_handlers import handle_keys, handle_mouse
-from bbt.loader_function.initialize_new_game import get_contants, get_game_variables
+from loader_function.initialize_new_game import get_contants, get_game_variables
 from render_functions import clear_all, render_all
 
 
 def main():
-    contants = get_contants
+    contants = get_contants()
 
     tcod.console_set_custom_font(
         "BBT\\fonts\\arial12x12.png", tcod.FONT_TYPE_GRAYSCALE | tcod.FONT_LAYOUT_TCOD)
-    tcod.console_init_root(contants['screen_width'], constants['screen_height'],
+    tcod.console_init_root(contants['screen_width'], contants['screen_height'],
                            contants['window_title'], False)
 
     con = tcod.console_new(
-        contants['screen_width'], constants['screen_height'])
+        contants['screen_width'], contants['screen_height'])
     panel = tcod.console_new(
-        contants['screen_width'], constants['screen_height'])
+        contants['screen_width'], contants['screen_height'])
 
     player, entities, game_map, message_log, game_state = get_game_variables(
-        constants)
+        contants)
 
     fov_recompute = True
 
     fov_map = initialize_fov(game_map)
-
-    message_log = MessageLog(
-        constants['message_x'], contants['message_width'], contants['message_height'])
 
     key = tcod.Key()
     mouse = tcod.Mouse()
@@ -48,7 +45,7 @@ def main():
 
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, contants['fov_radius'],
-                          constants['fov_light_walls'], constants['fov_algorithm'])
+                          contants['fov_light_walls'], contants['fov_algorithm'])
 
         render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, contants['screen_width'],
                    contants['screen_height'], contants['bar_width'], contants['panel_height'], contants['panel_y'], mouse, contants['colors'], game_state)
