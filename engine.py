@@ -50,6 +50,8 @@ def main():
         render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, contants['screen_width'],
                    contants['screen_height'], contants['bar_width'], contants['panel_height'], contants['panel_y'], mouse, contants['colors'], game_state)
 
+
+def play_game(player, entities, game_map, message_log, game_state, con, panel, constants):
         fov_recompute = False
 
         tcod.console_flush()
@@ -96,9 +98,9 @@ def main():
                     player_turn_results.extend(pickup_results)
 
                     break
-                else:
-                    message_log.add_message(
-                        Message('There is nothing here to pick up.', tcod.yellow))
+            else:
+                message_log.add_message(
+                    Message('There is nothing here to pick up.', tcod.yellow))
 
         if show_inventory:
             previous_game_state = game_state
@@ -130,9 +132,11 @@ def main():
         if exit:
             if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
                 game_state = previous_game_state
-            elif game_state == GameStates.TARGETING:
+            elif game_state == GameStates.TARGETTING:
                 player_turn_results.append({'targeting_cancelled': True})
             else:
+                save_game(player, entities, game_map, message_log, game_state)
+
                 return True
 
         if fullscreen:
