@@ -5,27 +5,82 @@ from entity import get_blocking_entities_at_location
 from fov_funcitons import initialize_fov, recompute_fov
 from game_messages import Message
 from game_states import GameStates
-from input_handlers import handle_keys, handle_mouse
-from loader_function.initialize_new_game import get_contants, get_game_variables
+from input_handlers import handle_keys, handle_mouse, handle_main_menu
+from loader_function.initialize_new_game import get_constants, get_game_variables
+from loader_function.data_loaders import load_game, save_game
+from menus import main_menu, message_box
 from render_functions import clear_all, render_all
 
 
 def main():
-    contants = get_contants()
+    constants = get_constants()
 
     tcod.console_set_custom_font(
         "BBT\\fonts\\arial12x12.png", tcod.FONT_TYPE_GRAYSCALE | tcod.FONT_LAYOUT_TCOD)
-    tcod.console_init_root(contants['screen_width'], contants['screen_height'],
-                           contants['window_title'], False)
+    tcod.console_init_root(constants['screen_width'], constants['screen_height'],
+                           constants['window_title'], False)
 
     con = tcod.console_new(
-        contants['screen_width'], contants['screen_height'])
+        constants['screen_width'], constants['screen_height'])
     panel = tcod.console_new(
-        contants['screen_width'], contants['screen_height'])
+        constants['screen_width'], constants['screen_height'])
 
-    player, entities, game_map, message_log, game_state = get_game_variables(
-        contants)
+    player = None
+    entities = []
+    game_map = None
+    message_log = None
+    game_state = None
+    
+    show_main_menu = True
+    show_load_error_message = False
+    main_menu_background_image = tcod.image_load('D:\\code\\BBT\\menu_background.png')
+    
+    key = tcod.Key()
+    mouse = tcod.Mouse()
+    while not tcod.console_is_window_closed():
+        tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE, key, mouse)
 
+        if show_main_menu:
+            main_menu(con, main_menu_background_image, constants['screen_width'],
+                      constants['screen_height'])
+
+            if show_load_error_message:
+                message_box(con, 'No save game to load', 50, constants['screen_width'], constants['screen_height'])
+
+            tcod.console_flush()
+
+            action = handle_main_menu(key)
+
+            new_game = action.get('new_game')
+            load_saved_game = action.get('load_game')
+            exit_game = action.get('exit')
+
+            if show_load_error_message and (new_game or load_saved_game or exit_game):
+                show_load_error_message = False
+            elif new_game:
+                player, entities, game_map, message_log, game_state = get_game_variables(constants)
+                game_state = GameStates.PLAYERS_TURN
+
+                show_main_menu = False
+            elif load_saved_game:
+                try:
+                    player, entities, game_map, message_log, game_state = load_game()
+                    show_main_menu = False
+                except FileNotFoundError:
+                    show_load_error_message = True
+            elif exit_game:
+                break
+
+        else:
+            tcod.console_clear(con)
+            play_game(player, entities, game_map, message_log, game_state, con, panel, constants)
+
+            show_main_menu = True
+#    player, entities, game_map, message_log, game_state = get_game_variables(
+#        constants)
+
+
+def play_game(player, entities, game_map, message_log, game_state, con, panel, constants):
     fov_recompute = True
 
     fov_map = initialize_fov(game_map)
@@ -33,25 +88,25 @@ def main():
     key = tcod.Key()
     mouse = tcod.Mouse()
 
+    game_state = GameStates.PLAYERS_TURN
     previous_game_state = game_state
 
     targeting_item = None
 
-    # 游戏主循环
     while not tcod.console_is_window_closed():
 
         tcod.sys_check_for_event(
             tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE, key, mouse)
 
         if fov_recompute:
-            recompute_fov(fov_map, player.x, player.y, contants['fov_radius'],
-                          contants['fov_light_walls'], contants['fov_algorithm'])
+            recompute_fov(fov_map, player.x, player.y, constants['fov_radius'],
+                          constants['fov_light_walls'], constants['fov_algorithm'])
 
-        render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, contants['screen_width'],
-                   contants['screen_height'], contants['bar_width'], contants['panel_height'], contants['panel_y'], mouse, contants['colors'], game_state)
+        render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, message_log, constants['screen_width'],
+                   constants['screen_height'], constants['bar_width'], constants['panel_height'], constants['panel_y'], mouse, constants['colors'], game_state)
 
 
-def play_game(player, entities, game_map, message_log, game_state, con, panel, constants):
+
         fov_recompute = False
 
         tcod.console_flush()
