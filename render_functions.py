@@ -70,7 +70,7 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         entities, key=lambda x: x.render_order.value)
 
     for entity in entities_in_render_order:
-        draw_entity(con, entity, fov_map)
+        draw_entity(con, entity, fov_map, game_map)
 
     tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
